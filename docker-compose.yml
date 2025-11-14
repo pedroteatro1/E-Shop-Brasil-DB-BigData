@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: eshop-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./init-mongo:/docker-entrypoint-initdb.d:ro
+
+  web:
+    build: .
+    container_name: eshop-streamlit
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/eshop
+    depends_on:
+      - mongo
+    volumes:
+      - ./:/app
+
+volumes:
+  mongo_data:
